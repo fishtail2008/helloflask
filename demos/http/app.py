@@ -20,10 +20,12 @@ app.secret_key = os.getenv('SECRET_KEY', 'secret string')
 
 
 # get name value from query string and cookie
+#/hello?name=yuwei
 @app.route('/')
 @app.route('/hello')
 def hello():
     name = request.args.get('name')
+    #name = request.args['name']
     if name is None:
         name = request.cookies.get('name', 'Human')
     response = '<h1>Hello, %s!</h1>' % escape(name)  # escape name to avoid XSS
@@ -53,6 +55,11 @@ def three_colors(color):
     return '<p>Love is patient and kind. Love is not jealous or boastful or proud or rude.</p>'
 
 
+# colors = ['blue', 'white', 'red']
+# @app.route('/mycolors/<any(%s):color>' % str(colors)[1:-1])
+# def three_colors(color):
+#     return '<p>Love is patient and kind. Love is not jealous or boastful or proud or rude.</p>'
+
 # return error response
 @app.route('/brew/<drink>')
 def teapot(drink):
@@ -66,6 +73,7 @@ def teapot(drink):
 @app.route('/404')
 def not_found():
     abort(404)
+    #return 'missing....'
 
 
 # return response with different formats
@@ -189,11 +197,13 @@ def load_post():
 @app.route('/foo')
 def foo():
     return '<h1>Foo page</h1><a href="%s">Do something and redirect</a>' \
-           % url_for('do_something', next=request.full_path)
+            % url_for('do_something', next=url_for("bar"))
+           #% url_for('do_something', next=request.full_path)
 
 
 @app.route('/bar')
 def bar():
+    print("/bar::", url_for("foo"))
     return '<h1>Bar page</h1><a href="%s">Do something and redirect</a>' \
            % url_for('do_something', next=request.full_path)
 
@@ -205,8 +215,14 @@ def do_something():
 
 
 def is_safe_url(target):
+    print("request.host_url::", request.host_url)
     ref_url = urlparse(request.host_url)
+    print("ref_url::", ref_url)
+    print("target::", target)
     test_url = urlparse(urljoin(request.host_url, target))
+    print("test_url", test_url)
+    print("test_url.scheme", test_url.scheme)
+    print("ref_url.netloc", ref_url.netloc)
     return test_url.scheme in ('http', 'https') and \
            ref_url.netloc == test_url.netloc
 
