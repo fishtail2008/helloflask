@@ -205,7 +205,8 @@ def foo():
 def bar():
     print("/bar::", url_for("foo"))
     return '<h1>Bar page</h1><a href="%s">Do something and redirect</a>' \
-           % url_for('do_something', next=request.full_path)
+           % url_for('do_something', next=url_for("foo"))
+           #% url_for('do_something', next=request.full_path)
 
 
 @app.route('/do-something')
